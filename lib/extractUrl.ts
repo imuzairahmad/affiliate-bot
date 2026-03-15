@@ -1,10 +1,11 @@
 export function extractUrl(text?: string): string | null {
   if (!text) return null;
 
-  const regex = /(https?:\/\/[^\s]+)/g;
-  const urls = text.match(regex);
+  const regex = /(https?:\/\/[^\s]+)/gi;
 
-  if (!urls) return null;
+  const match = text.match(regex);
 
-  return urls[0];
+  if (!match) return null;
+
+  return match[0].replace(/[)>.,]$/, "");
 }

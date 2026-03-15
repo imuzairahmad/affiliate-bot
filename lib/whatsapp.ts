@@ -1,28 +1,34 @@
 import axios from "axios";
 
-export async function sendMessage(to: string, message: string): Promise<void> {
+export async function sendMessage(to: string, message: string) {
   const phoneId = process.env.PHONE_NUMBER_ID;
   const token = process.env.WHATSAPP_TOKEN;
 
-  if (!phoneId || !token) {
-    throw new Error("Missing WhatsApp environment variables");
-  }
-
   const url = `https://graph.facebook.com/v19.0/${phoneId}/messages`;
 
-  await axios.post(
-    url,
-    {
-      messaging_product: "whatsapp",
-      to,
-      type: "text",
-      text: { body: message },
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+  try {
+    const response = await axios.post(
+      url,
+      {
+        messaging_product: "whatsapp",
+        to: to,
+        type: "text",
+        text: {
+          body: message,
+        },
       },
-    },
-  );
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("WhatsApp send error:", error.response?.data || error);
+    throw error;
+  }
 }

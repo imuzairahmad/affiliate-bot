@@ -1,15 +1,30 @@
-export function convertToAffiliate(url: string | null): string | null {
-  if (!url) return null;
+export function isAmazonLink(url: string): boolean {
+  const amazonDomains = [
+    "amazon.com",
+    "amazon.in",
+    "amazon.co.uk",
+    "amazon.de",
+    "amazon.ca",
+    "amazon.ae",
+    "amzn.to",
+  ];
 
-  const tag = process.env.AMAZON_TAG;
+  return amazonDomains.some((domain) => url.includes(domain));
+}
 
-  if (!tag) {
-    throw new Error("Missing AMAZON_TAG");
+export function extractASIN(url: string): string | null {
+  const patterns = [
+    /\/dp\/([A-Z0-9]{10})/,
+    /\/gp\/product\/([A-Z0-9]{10})/,
+    /\/product\/([A-Z0-9]{10})/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) {
+      return match[1];
+    }
   }
 
-  if (url.includes("?")) {
-    return `${url}&tag=${tag}`;
-  }
-
-  return `${url}?tag=${tag}`;
+  return null;
 }
